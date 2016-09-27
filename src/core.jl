@@ -38,16 +38,20 @@ end
 ==(am::AffineMap, bm::AffineMap) = (am.mat == bm.mat) & (am.offset == bm.offset)
 
 function full(am::AffineMap)
-    n,m = size(am)
-    N = n+1; M = m+1
-    out = zeros(eltype(am), N,M)
+    T = eltype(am)
+    n, m = size(am)
+    N, M = n+1, m+1
+    out = Array(T, N, M)
     @inbounds begin
-        for i in 1:n, j in 1:m
+        for j in 1:m, i in 1:n
             out[i,j] = am.mat[i,j]
         end
-        out[N,M] = one(eltype(am))
+        out[N,M] = one(T)
         for i in 1:n
             out[i, M] = am.offset[i]
+        end
+        for j in 1:m
+            out[N, j] = zero(T)
         end
     end
     out
@@ -56,7 +60,7 @@ end
 isapprox(am1::AffineMap, am2::AffineMap; kw...) = isapprox(full(am1), full(am2); kw...)
 
 eye{M,V}(::Type{AffineMap{M, V}}) = AffineMap(eye(M), zeros(V))
-eye(am::AffineMap) = eye(typeof(am))
+eye(am::AffineMap) = typeof(am)(eye(matrix(am)), zeros(offset(am)))
 
 for fun in [:zeros, :rand, :randn]
     @eval ($fun){M,V}(::Type{AffineMap{M, V}}) = AffineMap(($fun)(M), ($fun)(V))
