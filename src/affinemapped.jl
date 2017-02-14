@@ -10,7 +10,7 @@ mapsize
 abstract AbstractAffineMapped
 
 type AffineMapped{AM <: AffineMap, OBJ} <: AbstractAffineMapped
-    _trafo :: AM
+    _trafo::AM
     _obj::OBJ
 end
 

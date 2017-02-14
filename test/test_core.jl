@@ -13,6 +13,11 @@
     @test [am*v; 1] ≈ full(am) * [v; 1]
     @test am == am
     @test am != bm
+    @test am * v == matrix(am) * v + offset(am)
+
+    # exotic shape
+    vs = randn(3, 10)
+    @test am * vs == matrix(am) * vs .+ offset(am)
 
     # full
     am = AffineMap([1 2 3; 4 5 6], [10, 20])
@@ -25,5 +30,7 @@
     @test eltype(m) == Int
     @test mf == m
     @test eltype(mf) == Float64
+
+    #
 
 end
