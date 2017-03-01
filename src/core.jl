@@ -29,7 +29,8 @@ size{M,V}(::Type{AffineMap{M,V}}, dim...) = size(M, dim...)
 size(am::AffineMap, dim...) = size(am.mat, dim...)
 
 *(am::AffineMap, bm::AffineMap) = AffineMap(am.mat * bm.mat, am.offset + am.mat * bm.offset)
-*(am::AffineMap, obj) = am.mat*obj .+ am.offset
+*(am::AffineMap, v::AbstractVector) = am.mat*v + am.offset  # extra method for vector to have nicer output type
+*(am::AffineMap, obj) = am.mat*obj .+ am.offset  # e.g. am * matrix whose columns are vectors
 
 function inv(am::AffineMap)
     imat = inv(am.mat)
