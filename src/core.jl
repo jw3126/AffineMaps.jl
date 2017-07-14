@@ -2,10 +2,10 @@ export AffineMap, matrix, offset, dimto, dimfrom
 
 import Base: size, *, inv, ==, full, eltype, isapprox, eye, convert, zeros, rand, randn
 
-immutable AffineMap{M,V}
+struct AffineMap{M,V}
     mat::M
     offset::V
-    function AffineMap(m::M, v::V)
+    function AffineMap{M,V}(m::M, v::V) where {M,V}
         @assert ndims(m) == 2
         @assert ndims(v) == 1
         @assert size(m, 1) == size(v, 1)
@@ -42,7 +42,7 @@ function full(am::AffineMap)
     T = eltype(am)
     n, m = size(am)
     N, M = n+1, m+1
-    out = Array(T, N, M)
+    out = Array{T}( N, M)
     @inbounds begin
         for j in 1:m, i in 1:n
             out[i,j] = am.mat[i,j]
