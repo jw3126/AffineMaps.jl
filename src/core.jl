@@ -2,10 +2,10 @@ export AffineMap, matrix, offset, dimto, dimfrom
 
 import Base: size, *, inv, ==, full, eltype, isapprox, eye, convert, zeros, rand, randn
 
-immutable AffineMap{M,V}
+struct AffineMap{M,V}
     mat::M
     offset::V
-    function AffineMap(m::M, v::V)
+    function AffineMap{M,V}(m::M, v::V) where {M,V}
         @assert ndims(m) == 2
         @assert ndims(v) == 1
         @assert size(m, 1) == size(v, 1)
@@ -15,6 +15,8 @@ immutable AffineMap{M,V}
 end
 # now that looks strange
 AffineMap{M, V}(m::M, v::V) = AffineMap{M,V}(m,v)
+
+(am::AffineMap)(x) = am * x
 
 eltype(am::AffineMap) = eltype(am.mat)
 eltype{M,V}(::Type{AffineMap{M,V}}) = eltype(M)
@@ -42,14 +44,14 @@ function full(am::AffineMap)
     T = eltype(am)
     n, m = size(am)
     N, M = n+1, m+1
-    out = Array(T, N, M)
+    out = Array{T}( N, M)
     @inbounds begin
         for j in 1:m, i in 1:n
             out[i,j] = am.mat[i,j]
         end
         out[N,M] = one(T)
         for i in 1:n
-            out[i, M] = am.offset[i]
+            out[i, M] = offset(am)[i]
         end
         for j in 1:m
             out[N, j] = zero(T)
@@ -66,6 +68,11 @@ eye(am::AffineMap) = typeof(am)(eye(matrix(am)), zeros(offset(am)))
 for fun in [:zeros, :rand, :randn]
     @eval ($fun){M,V}(::Type{AffineMap{M, V}}) = AffineMap(($fun)(M), ($fun)(V))
     @eval ($fun)(am::AffineMap) = ($fun)(typeof(am))
+end
+
+for op in [:(+), :(-)]
+    @eval import Base: $op
+    @eval ($op)(am1::AffineMap, am2::AffineMap) = AffineMap( $op(matrix(am1), matrix(am2)), $op(offset(am1), offset(am2)) )
 end
 
 convert{M,V}(AM::Type{AffineMap{M,V}}, am::AffineMap) = AM(M(am.mat), V(am.offset))

@@ -7,9 +7,9 @@ object,
 set_object!,
 mapsize
 
-abstract AbstractAffineMapped
+abstract type AbstractAffineMapped end
 
-type AffineMapped{AM <: AffineMap, OBJ} <: AbstractAffineMapped
+mutable struct AffineMapped{AM <: AffineMap, OBJ} <: AbstractAffineMapped
     _trafo::AM
     _obj::OBJ
 end
