@@ -11,6 +11,8 @@
     @test offset(am + bm) == offset(am) + offset(bm)
     @test offset(am - bm) == offset(am) - offset(bm)
 
+    @test am * v == am(v)
+
     @test size(am) == (3,3)
     @test full(am * bm) ≈ full(am) * full(bm)
     @test full(inv(am)) ≈ inv(full(am))

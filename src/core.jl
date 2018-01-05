@@ -73,3 +73,5 @@ for fun in [:zeros, :rand, :randn]
 end
 
 convert(AM::Type{AffineMap{M,V}}, am::AffineMap) where {M,V} = AM(M(am.mat), V(am.offset))
+
+(am::AffineMap)(x) = am * x
