@@ -7,20 +7,20 @@ object,
 set_object!,
 mapsize
 
-abstract AbstractAffineMapped
+abstract type AbstractAffineMapped end
 
-type AffineMapped{AM <: AffineMap, OBJ} <: AbstractAffineMapped
+mutable struct AffineMapped{AM <: AffineMap, OBJ} <: AbstractAffineMapped
     _trafo::AM
     _obj::OBJ
 end
 
 Base.copy(amo::AffineMapped) = typeof(amo)(amo._trafo, amo._obj)
 
-transform{AM, OBJ}(::Type{AffineMapped{AM, OBJ}}) = AM
+transform(::Type{AffineMapped{AM, OBJ}}) where {AM, OBJ} = AM
 transform(amo::AbstractAffineMapped) = amo._trafo
 set_transform!(amo::AbstractAffineMapped, am::AffineMap) = (amo._trafo = am; amo)
 
-object{AM, OBJ}(::Type{AffineMapped{AM, OBJ}}) = OBJ
+object(::Type{AffineMapped{AM, OBJ}}) where {AM, OBJ} = OBJ
 object(amo::AffineMapped) = amo._obj
 set_object!(amo::AffineMapped, obj) = (amo._obj = obj; amo)
 
@@ -33,9 +33,9 @@ transform(am::AffineMap, amo::AbstractAffineMapped) = transform!(am, copy(amo))
 
 *(am::AffineMap, amo::AbstractAffineMapped) = transform(am, amo)
 
-mapsize{AMO <: AbstractAffineMapped}(::Type{AMO}) = AMO |> transform |> size
+mapsize(::Type{AMO}) where {AMO <: AbstractAffineMapped} = AMO |> transform |> size
 mapsize(amo::AbstractAffineMapped) = amo |> transform |> size
 
-function Base.rand{AM, OBJ}(AMO::Type{AffineMapped{AM, OBJ}})
+function Base.rand(AMO::Type{AffineMapped{AM, OBJ}}) where {AM, OBJ}
     AMO(rand(AM), rand(OBJ))
 end

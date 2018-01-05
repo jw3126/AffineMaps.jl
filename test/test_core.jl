@@ -7,6 +7,10 @@
     bm = AffineMap(randn(3,3), randn(3))
     v = randn(3)
 
+    @test matrix(am + bm) == matrix(am) + matrix(bm)
+    @test offset(am + bm) == offset(am) + offset(bm)
+    @test offset(am - bm) == offset(am) - offset(bm)
+
     @test size(am) == (3,3)
     @test full(am * bm) ≈ full(am) * full(bm)
     @test full(inv(am)) ≈ inv(full(am))
@@ -31,6 +35,5 @@
     @test mf == m
     @test eltype(mf) == Float64
 
-    #
 
 end
